@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+		"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 系统参数Mapper层接口映射文件 -->
+<mapper namespace="com.zhj.openapi.mapper.SystemParamMapper">
+
+	<!-- 添加系统参数 -->
+	<insert id="insertSystemParam" parameterType="com.zhj.openapi.domain.SystemParam">
+		INSERT INTO
+			api_systemparam (name, description, state)
+		VALUES (#{name}, #{description}, #{state});
+	</insert>
+
+	<!-- 删除系统参数 -->
+	<delete id="deleteSystemParam">
+		delete from api_systemparam
+		where
+		<foreach collection="array" separator="or" item="id">
+			id = #{id}
+		</foreach>
+	</delete>
+
+	<!-- 修改系统参数 -->
+	<update id="updateSystemParam" parameterType="com.zhj.openapi.domain.SystemParam">
+		update api_systemparam
+		<set>
+			<if test="null != name and '' != name">
+				name = #{name},
+			</if>
+
+			<if test="null != description and '' != description">
+				description = #{description},
+			</if>
+
+			<if test="null != state">
+				state = #{state},
+			</if>
+
+		</set>
+		where id = #{id}
+	</update>
+
+	<!-- 查询全部系统参数 或 根据条件查询系统参数 -->
+	<select id="selectSystemParam" resultType="com.zhj.openapi.domain.SystemParam">
+		SELECT
+			id,
+			name,
+			description,
+		    state
+		FROM
+			api_systemparam
+		<where>
+			<if test="null != name and '' != name">
+				and name like concat('%', #{name}, '%')
+			</if>
+
+			<if test="0 == state or 1 == state">
+				and state = #{state}
+			</if>
+		</where>
+	</select>
+
+</mapper>

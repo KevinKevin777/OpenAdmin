@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+		"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 路由Mapper层接口映射文件 -->
+<mapper namespace="com.zhj.openapi.mapper.MappingMapper">
+
+	<!-- 添加用户 -->
+	<insert id="insertMapping" parameterType="com.zhj.openapi.domain.Mapping">
+		INSERT INTO
+			api_mapping (gatewayApiName, insideApiUrl, state, description, serviceId, idempotents, needfee)
+		VALUES (#{gatewayApiName}, #{insideApiUrl}, #{state}, #{description}, #{serviceId}, #{idempotents}, #{needfee});
+	</insert>
+
+	<!-- 删除路由 -->
+	<delete id="deleteMapping">
+		delete from api_mapping
+		where
+		<foreach collection="array" separator="or" item="id">
+			id = #{id}
+		</foreach>
+	</delete>
+
+	<!-- 修改路由 -->
+	<update id="updateMapping" parameterType="com.zhj.openapi.domain.Mapping">
+		update api_mapping
+		<set>
+			<if test="null != gatewayApiName and '' != gatewayApiName">
+				gatewayApiName = #{gatewayApiName},
+			</if>
+
+			<if test="null != insideApiUrl and '' != insideApiUrl">
+				insideApiUrl = #{insideApiUrl},
+			</if>
+
+			<if test="null != state">
+				state = #{state},
+			</if>
+
+			<if test="null != description and '' != description">
+				description = #{description},
+			</if>
+
+			<if test="null != serviceId and '' != serviceId">
+				serviceId = #{serviceId},
+			</if>
+
+			<if test="null != idempotents and '' != idempotents">
+				idempotents = #{idempotents},
+			</if>
+
+			<if test="null != needfee">
+				needfee = #{needfee},
+			</if>
+		</set>
+		where id = #{id}
+	</update>
+
+	<!-- 查询全部路由 或 根据条件查询路由 -->
+	<select id="selectMapping" resultType="com.zhj.openapi.domain.Mapping">
+		SELECT
+			id,
+			gatewayApiName,
+			insideApiUrl,
+			state,
+			description,
+			serviceId,
+			idempotents,
+			needfee
+		FROM
+			api_mapping
+		<where>
+			<if test="null != gatewayApiName and '' != gatewayApiName">
+				and gatewayApiName like concat('%', #{gatewayApiName}, '%')
+			</if>
+
+			<if test="0 == state or 1 == state">
+				and state = #{state}
+			</if>
+		</where>
+	</select>
+
+</mapper>

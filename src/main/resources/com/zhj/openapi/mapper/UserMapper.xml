@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+		"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 用户Mapper层接口映射文件 -->
+<mapper namespace="com.zhj.openapi.mapper.UserMapper">
+
+	<!-- 登录; 根据邮箱查询用户 -->
+	<select id="login" resultType="com.zhj.openapi.domain.User">
+		select
+		       ID,
+		       PASSWORD,
+		       EMAIL,
+		       REAL_NAME realName,
+		       STATUS
+		from
+		     admin_user
+		where
+		      EMAIL = #{email}
+	</select>
+
+	<!-- 添加用户 -->
+	<insert id="insertUser" parameterType="com.zhj.openapi.domain.User">
+		INSERT INTO
+			admin_user ( password, email, real_name, status )
+			VALUES ( #{password}, #{email}, #{realName}, #{status} );
+	</insert>
+
+	<!-- 添加用户对应角色关系 -->
+	<update id="insertUserAndRole">
+		INSERT INTO
+			user_role ( USER_ID, ROLE_ID )
+			VALUES ( #{userId}, #{roleId} )
+	</update>
+
+	<!-- 删除用户 -->
+	<delete id="deleteUser">
+		delete from admin_user
+		where
+		<foreach collection="array" separator="or" item="id">
+			id = #{id}
+		</foreach>
+	</delete>
+
+	<!-- 删除用户对应角色表中数据,根据用户ID -->
+	<delete id="deleteUserAndRoleByUserId">
+		delete from user_role
+		where
+		<foreach collection="array" separator="or" item="id">
+			USER_ID = #{id}
+		</foreach>
+	</delete>
+
+	<!-- 修改用户 -->
+	<update id="updateUser" parameterType="com.zhj.openapi.domain.User">
+		update admin_user
+		<set>
+			<if test="null != password and '' != password">
+				password = #{password},
+			</if>
+
+			<if test="null != email and '' != email">
+				email = #{email},
+			</if>
+
+			<if test="null != realName and '' != realName">
+				real_name = #{realName},
+			</if>
+
+		    <if test="null != status">
+			    status = #{status},
+		    </if>
+		</set>
+		where id = #{id}
+	</update>
+
+	<!-- 查询全部用户 或 根据条件查询用户 -->
+	<select id="selectUser" resultType="com.zhj.openapi.domain.User">
+		SELECT
+			id,
+			password,
+			email,
+			real_name realName,
+			status
+		FROM
+			admin_user
+		<where>
+			<if test="null != realName and '' != realName">
+				and real_name like concat('%', #{realName}, '%')
+			</if>
+
+			<if test="null != email and '' != email">
+				and email like concat('%', #{email}, '%')
+			</if>
+
+			<if test="0 == status or 1 == status">
+				and status = #{status}
+			</if>
+		</where>
+	</select>
+
+	<!-- 查询用户对应角色ID,根据用户ID查询 -->
+	<select id="selectRoleIdByUserId" resultType="java.lang.Integer">
+		SELECT
+			ROLE_ID
+		FROM
+			user_role
+		WHERE
+			USER_ID = #{userId}
+	</select>
+
+	<!-- 查询全部角色列表 -->
+	<select id="selectAllRole" resultType="com.zhj.openapi.domain.Role">
+		SELECT
+			id,
+			name,
+			remark,
+			status
+		FROM
+			role
+	</select>
+</mapper>

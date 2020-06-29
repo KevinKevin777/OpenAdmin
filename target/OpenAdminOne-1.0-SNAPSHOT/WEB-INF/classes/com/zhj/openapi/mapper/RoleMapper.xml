@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+		"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 角色Mapper层接口映射文件 -->
+<mapper namespace="com.zhj.openapi.mapper.RoleMapper">
+
+	<!-- 添加角色 -->
+	<insert id="insertRole" parameterType="com.zhj.openapi.domain.Role">
+		INSERT INTO
+			role ( NAME, remark, status )
+			VALUES( #{name}, #{remark}, #{status} )
+	</insert>
+
+	<!-- 添加角色对应菜单关系 -->
+	<update id="insertRoleAndMenu">
+		INSERT INTO
+			role_menu ( ROLE_ID, MENU_ID )
+		VALUES ( #{roleId}, #{menuId} )
+	</update>
+
+	<!-- 删除用户对应角色表中数据,根据角色ID -->
+	<delete id="deleteUserAndRolByRoleId">
+		delete from user_role
+		where
+		<foreach collection="array" separator="or" item="id">
+			ROLE_ID = #{id}
+		</foreach>
+	</delete>
+
+	<!-- 删除角色 -->
+	<delete id="deleteRoleById">
+		delete from role
+		where
+		<foreach collection="array" separator="or" item="id">
+			id = #{id}
+		</foreach>
+	</delete>
+
+	<!-- 删除角色对应菜单表中数据,根据角色ID -->
+	<delete id="deleteRoleAndMenuByRoleId">
+		delete from role_menu
+		where
+		<foreach collection="array" separator="or" item="id">
+			ROLE_ID = #{id}
+		</foreach>
+	</delete>
+
+	<!-- 修改角色 -->
+	<update id="updateRole" parameterType="com.zhj.openapi.domain.Role">
+		update role
+		<set>
+			<if test="null != name and '' != name">
+				name = #{name},
+			</if>
+
+			<if test="null != remark and '' != remark">
+				remark = #{remark},
+			</if>
+
+			<if test="null != status">
+				status = #{status},
+			</if>
+
+		</set>
+		where id = #{id}
+	</update>
+
+	<!-- 查询全部角色 或 根据名字模糊查询 -->
+	<select id="selectAllRole" resultType="com.zhj.openapi.domain.Role">
+		SELECT
+			id,
+			NAME,
+			remark,
+			status
+		FROM
+			role
+		<where>
+			<if test="null != name and '' != name">
+				name like concat('%', #{name}, '%')
+			</if>
+		</where>
+	</select>
+
+	<!-- 查询角色已授权的菜单列表,根据角色ID查询 -->
+	<select id="selectMenuListById" resultType="java.lang.Integer">
+		SELECT
+			menu_id
+		FROM
+			role_menu
+		WHERE
+			ROLE_ID = #{roleId}
+	</select>
+
+	<!-- 查询全部菜单 -->
+	<select id="selectAllMenuList" resultType="com.zhj.openapi.domain.Menu">
+		SELECT
+			id,
+			NAME,
+			parent_id parentId,
+			url,
+			icon,
+			type,
+			sort
+		FROM
+			menu
+	</select>
+
+</mapper>

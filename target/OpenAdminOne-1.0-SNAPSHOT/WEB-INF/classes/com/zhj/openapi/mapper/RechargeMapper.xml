@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+		"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 充值Mapper层接口映射文件 -->
+<mapper namespace="com.zhj.openapi.mapper.RechargeMapper">
+
+	<!-- 添加充值 -->
+	<insert id="insertRecharge" parameterType="com.zhj.openapi.domain.Recharge">
+		INSERT INTO
+			recharge (cusId, orderId, createTime, updateTime, money, state, paymentType)
+		VALUES (#{cusId}, #{orderId}, #{createTime}, #{updateTime}, #{money}, #{state}, #{paymentType});
+	</insert>
+
+	<!-- 删除充值 -->
+	<delete id="deleteRecharge">
+		delete from recharge
+		where
+		<foreach collection="array" separator="or" item="id">
+			id = #{id}
+		</foreach>
+	</delete>
+
+	<!-- 删除充值,根据客户ID -->
+	<delete id="deleteRechargeByCustomerId">
+		delete from recharge
+		where
+		<foreach collection="customerIds" separator="or" item="customerId">
+			cusId = #{customerId}
+		</foreach>
+	</delete>
+
+	<!-- 修改充值 -->
+	<update id="updateRecharge" parameterType="com.zhj.openapi.domain.Recharge">
+		update recharge
+		<set>
+			<if test="null != cusId">
+				cusId = #{cusId},
+			</if>
+
+			<if test="null != updateTime">
+				updatetime = #{updateTime},
+			</if>
+
+			<if test="null != money">
+				money = #{money},
+			</if>
+
+			<if test="null != state">
+				state = #{state},
+			</if>
+
+			<if test="null != paymentType">
+				paymenttype = #{paymentType},
+			</if>
+		</set>
+		where id = #{id}
+	</update>
+
+	<!-- 查询全部充值 -->
+	<select id="selectRecharge" resultType="com.zhj.openapi.domain.Recharge">
+		SELECT
+			id,
+			cusId,
+			orderId,
+			createTime,
+			updateTime,
+			money,
+			state,
+			paymentType
+		FROM
+			recharge
+	</select>
+
+</mapper>

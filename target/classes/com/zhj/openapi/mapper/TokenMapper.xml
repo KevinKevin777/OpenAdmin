@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+		"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 标记Mapper层接口映射文件 -->
+<mapper namespace="com.zhj.openapi.mapper.TokenMapper">
+
+	<!-- 删除标记 -->
+	<delete id="deleteToken">
+		delete from user_token
+		where
+		<foreach collection="array" separator="or" item="id">
+			id = #{id}
+		</foreach>
+	</delete>
+
+	<!-- 删除标记,根据客户ID -->
+	<delete id="deleteTokenByCustomerId">
+		delete from user_token
+		where
+		<foreach collection="customerIds" separator="or" item="customerId">
+			cusId = #{customerId}
+		</foreach>
+	</delete>
+
+	<!-- 删除标记,根据应用ID -->
+	<delete id="deleteTokenByApplicationId">
+		delete from user_token
+		where
+		<foreach collection="ApplicationIds" separator="or" item="ApplicationId">
+			appId = #{ApplicationId}
+		</foreach>
+	</delete>
+
+	<!-- 修改标记 -->
+	<update id="updateToken" parameterType="com.zhj.openapi.domain.Token">
+		update user_token
+		<set>
+			<if test="null != appId">
+				appId = #{appId},
+			</if>
+
+			<if test="null != cusId">
+				cusId = #{cusId},
+			</if>
+
+			<if test="null != accessToken and '' != accessToken">
+				access_token = #{accessToken},
+			</if>
+
+			<if test="null != expireTime">
+				expireTime = #{expireTime},
+			</if>
+
+			<if test="null != startTime">
+				startTime = #{startTime},
+			</if>
+
+		</set>
+		where id = #{id}
+	</update>
+
+	<!-- 查询全部标记 或 根据条件查询标记 -->
+	<select id="selectToken" resultType="com.zhj.openapi.domain.Token">
+		SELECT
+			id,
+			appId,
+			cusId,
+			access_token accessToken,
+			expireTime,
+			startTime
+		FROM
+			user_token
+		<where>
+			<if test="null != accessToken and '' != accessToken">
+				and access_token like concat('%', #{accessToken}, '%')
+			</if>
+		</where>
+	</select>
+
+</mapper>

@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+		"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 菜单Mapper层接口映射文件 -->
+<mapper namespace="com.zhj.openapi.mapper.MenuMapper">
+
+	<!--添加菜单-->
+	<insert id="insertMenu" parameterType="com.zhj.openapi.domain.Menu">
+		INSERT INTO
+		    menu ( id, name, parent_id, url, icon, perms, type, sort )
+		    VALUES ( #{id}, #{name}, #{parentId}, #{url}, #{icon}, #{perms}, #{type}, #{sort} )
+	</insert>
+
+	<!--删除菜单-->
+	<delete id="deleteMenu">
+		delete from menu
+		where
+		<foreach collection="array" separator="or" item="id">
+			id = #{id}
+		</foreach>
+	</delete>
+
+	<!--删除角色对应菜单关系-->
+	<delete id="deleteRoleAndMenu">
+		delete from role_menu
+		where
+		<foreach collection="array" separator="or" item="id">
+			menu_id = #{id}
+		</foreach>
+	</delete>
+
+	<!--修改菜单-->
+	<update id="updateMenu" parameterType="com.zhj.openapi.domain.Menu">
+		update menu
+		<set>
+			<if test="null != name and '' != name">
+				name = #{name},
+			</if>
+			<if test="0 != parentId">
+				parent_id = #{parentId},
+			</if>
+			<if test="null != url and '' != url">
+				url = #{url},
+			</if>
+			<if test="null != icon and '' != icon">
+				icon = #{icon},
+			</if>
+			<if test="null != perms and '' != perms">
+				perms = #{perms},
+			</if>
+
+			<if test="null != type">
+				type = #{type},
+			</if>
+
+			<if test="0 != sort">
+				sort = #{sort},
+			</if>
+		</set>
+		where id = #{id}
+	</update>
+
+	<!--根绝用户ID得到左侧菜单列表-->
+	<select id="getUserMenusByUserId" resultType="com.zhj.openapi.domain.Menu">
+		SELECT
+			menu.id,
+			menu.NAME,
+			menu.parent_id parentId,
+			menu.url,
+			menu.icon,
+			menu.type,
+			menu.sort
+		FROM
+			menu
+				INNER JOIN role_menu ON role_menu.MENU_ID = menu.ID
+				INNER JOIN user_role ON user_role.ROLE_ID = role_menu.ROLE_ID
+		WHERE
+			user_role.USER_ID = #{id}
+		ORDER BY
+			menu.SORT asc;
+
+	</select>
+
+	<!--查询全部菜单-->
+	<select id="getAllMenu" resultType="com.zhj.openapi.domain.Menu">
+		SELECT
+			id,
+			NAME,
+			parent_id parentId,
+			url,
+			icon,
+			type,
+			sort
+		FROM
+			menu
+	</select>
+
+	<!--查询一个菜单,根据ID-->
+	<select id="selectMenuById" resultType="com.zhj.openapi.domain.Menu">
+		SELECT DISTINCT
+			id,
+			NAME,
+			parent_id parentId,
+			url,
+			icon,
+			perms,
+			type,
+			sort
+		FROM
+			menu m
+		WHERE
+			id = #{id}
+	</select>
+
+</mapper>
